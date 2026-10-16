@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#04050d">
-<meta name="description" content="Gaurav Yadav — offensive security learner. TryHackMe, Hack The Box, OSCP prep.">
+<meta name="description" content="Gaurav Yadav — offensive security learner. TryHackMe, Hack The Box, picoCTF, OffSec, OSCP prep.">
 <title>Gaurav Yadav · RootShield</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -139,42 +139,106 @@ body.light .vignette{background:radial-gradient(ellipse at 50% 45%,transparent 4
   transform:translate(-50%,-50%);
   will-change:transform;
   mix-blend-mode:screen;
-  transition:opacity .4s ease;
+  transition:opacity .4s ease,width .3s ease,height .3s ease;
 }
 body.light .cursor-glow{background:radial-gradient(circle,rgba(109,77,240,.10),transparent 62%);mix-blend-mode:multiply}
 
 /* ============================================================
-   LOADER
+   LOADER  (minimal)
 ============================================================ */
 #loader{
   position:fixed;inset:0;z-index:9999;
   display:grid;place-items:center;
-  background:#04050d;
+  background:radial-gradient(ellipse at 50% 50%, #06081a 0%, #04050d 70%);
   transition:opacity .7s cubic-bezier(.22,1,.36,1),visibility .7s;
 }
 #loader.done{opacity:0;visibility:hidden}
-.loader-inner{width:min(380px,84vw);text-align:center}
+
+#loader::before{
+  content:'';
+  position:absolute;
+  width:480px;height:480px;border-radius:50%;
+  left:50%;top:50%;transform:translate(-50%,-50%);
+  background:radial-gradient(circle, rgba(95,240,212,.14), transparent 62%);
+  pointer-events:none;
+  animation:loaderGlow 3s ease-in-out infinite;
+}
+@keyframes loaderGlow{
+  0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(1)}
+  50%{opacity:.95;transform:translate(-50%,-50%) scale(1.08)}
+}
+
+.loader-inner{
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+}
+
 .loader-mark{
-  width:68px;height:68px;margin:0 auto 20px;border-radius:20px;
+  width:60px;height:60px;
+  border-radius:18px;
   display:grid;place-items:center;
-  font-family:'Space Grotesk';font-weight:700;font-size:1.5rem;color:#04050d;
+  font-family:'Space Grotesk';
+  font-weight:700;
+  font-size:1.28rem;
+  letter-spacing:-.04em;
+  color:#04050d;
   background:linear-gradient(135deg,#5ff0d4,#a78bfa);
-  box-shadow:0 0 46px -6px rgba(95,240,212,.55);
+  box-shadow:
+    0 0 50px -6px rgba(95,240,212,.75),
+    0 0 100px -18px rgba(167,139,250,.55),
+    inset 0 1.5px 0 rgba(255,255,255,.45);
+  margin-bottom:22px;
+  animation:markPulse 2.6s ease-in-out infinite;
 }
+@keyframes markPulse{
+  0%,100%{
+    transform:scale(1);
+    box-shadow:
+      0 0 50px -6px rgba(95,240,212,.75),
+      0 0 100px -18px rgba(167,139,250,.55),
+      inset 0 1.5px 0 rgba(255,255,255,.45);
+  }
+  50%{
+    transform:scale(1.05);
+    box-shadow:
+      0 0 70px -4px rgba(95,240,212,1),
+      0 0 130px -14px rgba(167,139,250,.75),
+      inset 0 1.5px 0 rgba(255,255,255,.55);
+  }
+}
+
 .loader-name{
-  font-family:'Space Grotesk';font-weight:600;letter-spacing:.42em;
-  font-size:.74rem;color:#5ff0d4;margin-bottom:24px;
+  font-family:'Space Grotesk';
+  font-weight:600;
+  font-size:.7rem;
+  letter-spacing:.52em;
+  text-indent:.52em;
+  color:#5ff0d4;
+  margin-bottom:26px;
+  opacity:.85;
+  text-shadow:0 0 22px rgba(95,240,212,.45);
 }
-.loader-bar{height:2px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden}
+
+.loader-bar{
+  width:180px;
+  height:2px;
+  background:rgba(255,255,255,.075);
+  border-radius:4px;
+  overflow:hidden;
+  position:relative;
+}
 .loader-bar i{
-  display:block;height:100%;width:0%;
+  display:block;
+  height:100%;
+  width:0%;
+  border-radius:4px;
   background:linear-gradient(90deg,#5ff0d4,#a78bfa);
-  box-shadow:0 0 14px #5ff0d4;
-  transition:width .25s ease;
-}
-.loader-status{
-  margin-top:14px;font-family:'JetBrains Mono';font-size:.66rem;
-  letter-spacing:.16em;color:#556;text-transform:uppercase;
+  box-shadow:0 0 12px #5ff0d4;
+  transition:width .35s cubic-bezier(.22,1,.36,1);
 }
 
 /* ============================================================
@@ -356,7 +420,7 @@ body.light .tt-knob{transform:translateX(28px)}
 .hero-role{
   font-family:'JetBrains Mono';font-size:clamp(.68rem,1.6vw,.84rem);
   letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
-  margin-bottom:38px;max-width:34ch;
+  margin-bottom:38px;max-width:40ch;
 }
 .hero-role b{color:var(--accent);font-weight:500}
 
@@ -477,9 +541,110 @@ body.light .terminal{background:rgba(12,18,40,.94)}
 }
 
 /* ============================================================
+   PLATFORM STATS
+============================================================ */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:18px}
+
+.stat-card{
+  position:relative;border-radius:22px;padding:24px 22px 22px;
+  background:var(--glass);
+  backdrop-filter:blur(20px) saturate(160%);
+  -webkit-backdrop-filter:blur(20px) saturate(160%);
+  border:1px solid var(--stroke);
+  box-shadow:var(--card-shadow);
+  transition:transform .4s cubic-bezier(.22,1,.36,1),border-color .3s,box-shadow .3s;
+  transform-style:preserve-3d;
+  will-change:transform;
+  overflow:hidden;
+}
+.stat-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--pc,linear-gradient(90deg,var(--accent),var(--accent-2)));
+  opacity:.9;
+}
+.stat-card::before{
+  content:'';position:absolute;width:220px;height:220px;border-radius:50%;
+  right:-90px;top:-90px;pointer-events:none;
+  background:radial-gradient(circle,var(--pg,rgba(95,240,212,.14)),transparent 68%);
+}
+.stat-card:hover{
+  border-color:var(--stroke-2);
+  box-shadow:0 34px 66px -26px rgba(0,0,0,.92),0 0 0 1px rgba(95,240,212,.18);
+}
+
+.stat-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;position:relative;z-index:2}
+.stat-logo{
+  width:44px;height:44px;border-radius:13px;display:grid;place-items:center;
+  font-size:1.25rem;flex-shrink:0;line-height:1;
+  background:linear-gradient(140deg,rgba(255,255,255,.14),rgba(255,255,255,.05));
+  border:1px solid var(--stroke);
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+}
+.stat-card:hover .stat-logo{transform:translateZ(26px) rotate(-7deg) scale(1.08)}
+.stat-name{font-size:1rem;font-weight:600;line-height:1.2}
+.stat-rank{
+  font-family:'JetBrains Mono';font-size:.6rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--accent);margin-top:3px;
+}
+
+.stat-metrics{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  margin-bottom:16px;position:relative;z-index:2;
+}
+.metric{
+  padding:10px 11px;border-radius:12px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--stroke);
+  transition:border-color .3s,background .3s;
+}
+body.light .metric{background:rgba(255,255,255,.5)}
+.stat-card:hover .metric{border-color:var(--stroke-2)}
+.metric-val{
+  font-family:'Space Grotesk';font-size:1.22rem;font-weight:700;
+  letter-spacing:-.03em;line-height:1.15;
+  background:linear-gradient(120deg,var(--text),var(--accent));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.metric-label{
+  font-family:'JetBrains Mono';font-size:.54rem;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);margin-top:3px;line-height:1.35;
+}
+
+.stat-foot{
+  display:flex;align-items:center;justify-content:flex-end;gap:10px;
+  position:relative;z-index:2;
+  padding-top:14px;border-top:1px solid var(--stroke);
+}
+.stat-link{
+  font-family:'JetBrains Mono';font-size:.64rem;letter-spacing:.04em;
+  color:var(--text);text-decoration:none;
+  display:inline-flex;align-items:center;gap:6px;
+  transition:color .3s,gap .3s;
+}
+.stat-link:hover{color:var(--accent);gap:10px}
+
+/* total strip */
+.stats-total{
+  margin-top:18px;border-radius:22px;padding:22px 26px;
+  background:var(--glass);
+  backdrop-filter:blur(20px) saturate(160%);
+  -webkit-backdrop-filter:blur(20px) saturate(160%);
+  border:1px solid var(--stroke);
+  box-shadow:var(--card-shadow);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:18px;text-align:center;
+}
+.total-item .metric-val{font-size:1.6rem}
+.total-item .metric-label{margin-top:5px}
+
+/* ============================================================
    PROJECTS
 ============================================================ */
-.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.projects-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:20px;
+}
 
 .proj-card{
   border-radius:22px;overflow:hidden;position:relative;
@@ -620,7 +785,7 @@ body.light .dock{box-shadow:0 24px 50px -20px rgba(40,60,130,.4), inset 0 1px 0 
 }
 
 /* ============================================================
-   REVEAL — with stagger support
+   REVEAL
 ============================================================ */
 .reveal{
   opacity:0;
@@ -652,6 +817,7 @@ footer .heart{color:var(--accent);display:inline-block;animation:spin 6s linear 
   .panel-body{padding:26px}
   .skills-grid{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
   .projects-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr}
 }
 
 @media(max-width:640px){
@@ -664,7 +830,8 @@ footer .heart{color:var(--accent);display:inline-block;animation:spin 6s linear 
   .panel-body{padding:20px}
   .contact-panel{padding:42px 20px}
   .dock{bottom:14px;bottom:calc(14px + env(safe-area-inset-bottom));gap:0;padding:6px;border-radius:20px}
-  .dock-item{width:46px;height:46px;border-radius:14px}
+  .dock-item{width:44px;height:44px;border-radius:14px}
+  .dock-item svg{width:18px;height:18px}
   .avatar{width:100px;height:100px}
   .avatar span{font-size:2rem}
   .terminal-body{font-size:.7rem;padding:15px}
@@ -676,13 +843,21 @@ footer .heart{color:var(--accent);display:inline-block;animation:spin 6s linear 
   .hero{padding:96px 18px 60px}
   .skills-grid{gap:14px}
   .skill-card{padding:22px 20px}
+  .stat-card{padding:22px 20px 20px}
+  .stats-total{padding:20px;gap:14px}
+
+  .loader-mark{width:52px;height:52px;font-size:1.12rem;border-radius:16px;margin-bottom:18px}
+  .loader-name{font-size:.62rem;letter-spacing:.46em;text-indent:.46em;margin-bottom:22px}
+  .loader-bar{width:150px}
 }
 
 @media(max-width:400px){
-  .dock-item{width:42px;height:42px}
-  .dock-item svg{width:18px;height:18px}
+  .dock-item{width:40px;height:40px}
+  .dock-item svg{width:17px;height:17px}
   .btn{padding:12px 20px;font-size:.8rem}
   .chips .chip{font-size:.64rem;padding:5px 12px}
+  .stat-metrics{gap:9px}
+  .metric-val{font-size:1.12rem}
 }
 
 /* ============================================================
@@ -711,7 +886,6 @@ footer .heart{color:var(--accent);display:inline-block;animation:spin 6s linear 
     <div class="loader-mark">RS</div>
     <div class="loader-name">ROOTSHIELD</div>
     <div class="loader-bar"><i id="loaderBar"></i></div>
-    <div class="loader-status" id="loaderStatus">booting</div>
   </div>
 </div>
 
@@ -744,7 +918,7 @@ footer .heart{color:var(--accent);display:inline-block;animation:spin 6s linear 
   <!-- ---------- HERO ---------- -->
   <section class="hero" id="hero">
     <div class="hero-inner">
-      <div class="status-pill" data-parallax="0.15"><span class="pulse"></span>OSCP Prep · THM · HTB</div>
+      <div class="status-pill" data-parallax="0.15"><span class="pulse"></span>OSCP · THM · HTB · picoCTF</div>
 
       <div class="avatar-wrap" data-parallax="0.25" data-scale-down>
         <div class="avatar-ring"></div>
@@ -758,7 +932,7 @@ footer .heart{color:var(--accent);display:inline-block;animation:spin 6s linear 
       <p class="hero-role" data-parallax="0.45" data-fade>Offensive Security <b>·</b> OSCP Candidate</p>
 
       <div class="hero-cta" data-parallax="0.55" data-fade>
-        <a href="#projects" class="btn btn-primary">Lab work →</a>
+        <a href="#stats" class="btn btn-primary">Platform stats →</a>
         <a href="#contact" class="btn btn-ghost">Get in touch</a>
       </div>
     </div>
@@ -785,13 +959,14 @@ footer .heart{color:var(--accent);display:inline-block;animation:spin 6s linear 
           <div class="panel-body about-grid">
 
             <div>
-              <p class="about-lead">👋 I'm <b>Gaurav</b> — grinding through <b>TryHackMe</b> and <b>Hack The Box</b>, locked in on the <b>OSCP</b>.</p>
-              <p class="about-p">Focused on Active Directory, privilege escalation and enumeration. I document every box I root and turn notes into reusable tooling.</p>
+              <p class="about-lead">👋 I'm <b>Gaurav</b> — grinding through <b>TryHackMe</b>, <b>Hack The Box</b> and <b>picoCTF</b>, locked in on the <b>OSCP</b>.</p>
+              <p class="about-p">Focused on Active Directory, web exploitation, privilege escalation and enumeration. I document every box I root and turn notes into reusable tooling.</p>
 
               <div class="chips">
                 <span class="chip">THM Top 10%</span>
-                <span class="chip">HTB Active</span>
-                <span class="chip">CTF Player</span>
+                <span class="chip">HTB Pro Hacker</span>
+                <span class="chip">picoCTF Player</span>
+                <span class="chip">OffSec PG</span>
               </div>
 
               <div class="terminal">
@@ -802,6 +977,8 @@ footer .heart{color:var(--accent);display:inline-block;animation:spin 6s linear 
                 <div class="terminal-body">
                   <div><span class="u">gaurav@rootshield</span><span class="dim">:~$</span> whoami</div>
                   <div class="dim">→ offensive security learner · OSCP in progress</div>
+                  <div><span class="u">gaurav@rootshield</span><span class="dim">:~$</span> cat platforms.txt</div>
+                  <div class="dim">→ thm · htb · picoctf · offsec</div>
                   <div style="margin-top:8px"><span class="u">gaurav@rootshield</span><span class="dim">:~$</span> <span class="caret"></span></div>
                 </div>
               </div>
@@ -813,7 +990,9 @@ footer .heart{color:var(--accent);display:inline-block;animation:spin 6s linear 
                 <div class="chips">
                   <span class="chip">🟢 TryHackMe</span>
                   <span class="chip">🟩 Hack The Box</span>
-                  <span class="chip">🎯 OSCP</span>
+                  <span class="chip">🐱 picoCTF</span>
+                  <span class="chip">🎯 OffSec</span>
+                  <span class="chip">🏴 OSCP</span>
                 </div>
               </div>
 
@@ -826,6 +1005,8 @@ footer .heart{color:var(--accent);display:inline-block;animation:spin 6s linear 
                   <span class="chip">BloodHound</span>
                   <span class="chip">Impacket</span>
                   <span class="chip">Wireshark</span>
+                  <span class="chip">Ghidra</span>
+                  <span class="chip">pwntools</span>
                   <span class="chip">Python</span>
                   <span class="chip">Bash</span>
                   <span class="chip">PowerShell</span>
@@ -853,12 +1034,30 @@ footer .heart{color:var(--accent);display:inline-block;animation:spin 6s linear 
     </div>
   </section>
 
+  <!-- ---------- PLATFORM STATS ---------- -->
+  <section class="section" id="stats">
+    <div class="wrap">
+      <div class="reveal">
+        <div class="sec-head">
+          <div class="sec-label">03 — platform stats</div>
+          <h2 class="sec-title">machines rooted, <em>ranks earned</em></h2>
+        </div>
+      </div>
+
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <div class="reveal" style="--d:520ms">
+        <div class="stats-total" id="statsTotal"></div>
+      </div>
+    </div>
+  </section>
+
   <!-- ---------- PROJECTS ---------- -->
   <section class="section" id="projects">
     <div class="wrap">
       <div class="reveal">
         <div class="sec-head">
-          <div class="sec-label">03 — featured builds</div>
+          <div class="sec-label">04 — featured builds</div>
           <h2 class="sec-title">lab &amp; field <em>projects</em></h2>
         </div>
       </div>
@@ -872,15 +1071,17 @@ footer .heart{color:var(--accent);display:inline-block;animation:spin 6s linear 
       <div class="reveal">
         <div class="panel contact-panel">
           <div class="contact-inner">
-            <div class="sec-label" style="justify-content:center">04 — connect</div>
+            <div class="sec-label" style="justify-content:center">05 — connect</div>
             <h2 class="contact-title">drop a <em>signal</em> 📡</h2>
             <p class="contact-sub">oscp prep · ctf · htb duo</p>
             <div class="contact-actions">
-              <a href="mailto:timep8433@gmail.com" class="btn btn-primary">📧 Email</a>
+              <a href="mailto:gauravramapati@gmail.com" class="btn btn-primary">📧 Email</a>
               <a href="https://github.com/gaurav-yadav27" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">🐙 GitHub</a>
               <a href="https://linkedin.com/in/gaurav-yadav-cybersecurity" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">💼 LinkedIn</a>
               <a href="https://tryhackme.com/p/btwgaurav" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">🟢 TryHackMe</a>
               <a href="https://profile.hackthebox.com/profile/019f617d-8139-72e8-86bd-4a465bab2aba" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">🟩 Hack The Box</a>
+              <a href="https://learn.cylabacademy.org/users/picogaurav" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">🐱 picoCTF</a>
+              <a href="https://portal.offsec.com/public-profile/38f64ce7-c444-4aa7-8fd6-d300f2314cb1" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">🎯 OffSec</a>
             </div>
           </div>
         </div>
@@ -888,7 +1089,7 @@ footer .heart{color:var(--accent);display:inline-block;animation:spin 6s linear 
     </div>
   </section>
 
-  <footer>© 2025 Gaurav Yadav · RootShield · try harder <span class="heart">◈</span></footer>
+  <footer>© 2026 Gaurav Yadav · RootShield · try harder <span class="heart">◈</span></footer>
 </main>
 
 <!-- ===================== DOCK ===================== -->
@@ -901,6 +1102,9 @@ footer .heart{color:var(--accent);display:inline-block;animation:spin 6s linear 
   </a>
   <a href="#skills" class="dock-item" data-label="Skills" data-sec="skills">
     <svg viewBox="0 0 24 24"><path d="M12 3 3 7.5l9 4.5 9-4.5L12 3Z"/><path d="m3 12.4 9 4.5 9-4.5"/><path d="m3 16.9 9 4.5 9-4.5"/></svg>
+  </a>
+  <a href="#stats" class="dock-item" data-label="Stats" data-sec="stats">
+    <svg viewBox="0 0 24 24"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg>
   </a>
   <a href="#projects" class="dock-item" data-label="Projects" data-sec="projects">
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>
@@ -918,33 +1122,24 @@ var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 var isMobile = window.matchMedia('(max-width: 640px)').matches;
 
 /* ============================================================
-   LOADER
+   LOADER — minimal
 ============================================================ */
 var loader    = document.getElementById('loader');
 var loaderBar = document.getElementById('loaderBar');
-var loaderTxt = document.getElementById('loaderStatus');
 
 if (reduceMotion){
   loader.classList.add('done');
 } else {
-  var steps = [
-    [0,'booting'],
-    [40,'loading modules'],
-    [80,'ready']
-  ];
-  var prog = 0, idx = -1;
+  var prog = 0;
   var t = setInterval(function(){
-    prog += Math.random() * 16 + 8;
+    prog += Math.random() * 14 + 8;
     if (prog >= 100){
       prog = 100;
       clearInterval(t);
-      setTimeout(function(){ loader.classList.add('done'); }, 260);
+      setTimeout(function(){ loader.classList.add('done'); }, 280);
     }
     loaderBar.style.width = prog + '%';
-    for (var i = steps.length - 1; i >= 0; i--){
-      if (prog >= steps[i][0] && idx < i){ idx = i; loaderTxt.textContent = steps[i][1]; break; }
-    }
-  }, 120);
+  }, 95);
 }
 
 /* ============================================================
@@ -1057,7 +1252,7 @@ addEventListener('resize', function(){
 }, { passive: true });
 
 /* ============================================================
-   POINTER PARALLAX (orbs follow cursor + glow follows cursor)
+   POINTER PARALLAX
 ============================================================ */
 var cursorGlow = document.getElementById('cursorGlow');
 var orbs = document.querySelectorAll('.orb');
@@ -1090,11 +1285,11 @@ if (!reduceMotion && !isMobile){
 ============================================================ */
 var skills = [
   { icon:'🔎', name:'Recon & Enumeration', sub:'Nmap · ffuf · SMB/NFS · Wireshark' },
-  { icon:'🌐', name:'Web Exploitation',    sub:'OWASP Top 10 · Burp · SQLi · LFI' },
+  { icon:'🌐', name:'Web Exploitation',    sub:'OWASP Top 10 · Burp · SQLi · LFI · XSS' },
   { icon:'🐧', name:'Linux PrivEsc',       sub:'LinPEAS · GTFOBins · SUID · Cron' },
   { icon:'🪟', name:'Windows & AD',        sub:'BloodHound · Kerberoasting · Impacket' },
   { icon:'💥', name:'Exploitation & Pivoting', sub:'Metasploit · Chisel · Buffer overflow' },
-  { icon:'🐍', name:'Scripting & Automation', sub:'Python · Bash · PowerShell' }
+  { icon:'🧩', name:'Reverse & Forensics', sub:'Ghidra · pwntools · binwalk · CyberChef' }
 ];
 
 var skillsGrid = document.getElementById('skillsGrid');
@@ -1110,31 +1305,134 @@ skills.forEach(function(s, i){
 skillsGrid.innerHTML = skillsHTML;
 
 /* ============================================================
-   PROJECTS
+   PLATFORM STATS
+   👉 Apne asli numbers yahan update karo
+============================================================ */
+var platforms = [
+  {
+    logo:'🟢',
+    name:'TryHackMe',
+    rank:'Top 10% · Global',
+    barColor:'linear-gradient(90deg,#5ff0d4,#3ec9a7)',
+    glow:'rgba(95,240,212,.16)',
+    metrics:[
+      { val:'45+',  label:'rooms solved' },
+      { val:'10',    label:'badges' },
+      { val:'TOP 10%', label:'global rank' },
+      { val:'1,049',  label:'points' }
+    ],
+    link:'https://tryhackme.com/p/btwgaurav?utm_campaign=social_share&utm_medium=social&utm_content=profile&cardVersion=dffbbcdeef80&utm_source=copy&sharerId=6924969b51540ae544a1b119'
+  },
+  {
+    logo:'🟩',
+    name:'Hack The Box',
+    rank:'Pro Hacker · Active',
+    barColor:'linear-gradient(90deg,#9fef00,#5ff0d4)',
+    glow:'rgba(159,239,0,.14)',
+    metrics:[
+      { val:'2',    label:'badges' },
+      { val:'1205',label:'Total XP' },
+      { val:'-',   label:'machines rooted' },
+      // { val:'-',    label:'ranked machines' } 
+    ],
+    link:'https://profile.hackthebox.com/profile/019f617d-8139-72e8-86bd-4a465bab2aba'
+  },
+
+  {
+    logo:'🎯',
+    name:'OffSec',
+    rank:'OSCP Candidate · PEN-200',
+    barColor:'linear-gradient(90deg,#a78bfa,#6d4df0)',
+    glow:'rgba(167,139,250,.18)',
+    metrics:[
+      { val:'20+',   label:'machines rooted' },
+      { val:'9',     label:'Flags captured' },
+      { val:'49k',label:'global rank' },
+      { val:'55+ h',    label:'Time in labs' }
+    ],
+    link:'https://portal.offsec.com/public-profile/38f64ce7-c444-4aa7-8fd6-d300f2314cb1'
+  },
+
+  {
+    logo:'🐱',
+    name:'picoCTF',
+    rank:'Global Competitor',
+    barColor:'linear-gradient(90deg,#ffb26b,#ff8f5e)',
+    glow:'rgba(255,178,107,.16)',
+    metrics:[
+      { val:'-',  label:'Easy' },
+      { val:'-',   label:'Medium' },
+      { val:'-', label:'Hard' },
+      // { val:'-', label:'points' }
+    ],
+    link:'https://learn.cylabacademy.org/users/picogaurav'
+  }
+  
+];
+
+var statsGrid = document.getElementById('statsGrid');
+var statsHTML = '';
+platforms.forEach(function(p, i){
+  var metricsHTML = '';
+  p.metrics.forEach(function(m){
+    metricsHTML +=
+      '<div class="metric">' +
+        '<div class="metric-val">' + m.val + '</div>' +
+        '<div class="metric-label">' + m.label + '</div>' +
+      '</div>';
+  });
+
+  statsHTML +=
+    '<div class="reveal" style="--d:' + (i * 100) + 'ms">' +
+      '<article class="stat-card" style="--pc:' + p.barColor + ';--pg:' + p.glow + '">' +
+        '<div class="stat-head">' +
+          '<div class="stat-logo">' + p.logo + '</div>' +
+          '<div>' +
+            '<div class="stat-name">' + p.name + '</div>' +
+            '<div class="stat-rank">' + p.rank + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="stat-metrics">' + metricsHTML + '</div>' +
+        '<div class="stat-foot">' +
+          '<a class="stat-link" href="' + p.link + '" target="_blank" rel="noopener noreferrer">view profile <span>→</span></a>' +
+        '</div>' +
+      '</article>' +
+    '</div>';
+});
+statsGrid.innerHTML = statsHTML;
+
+/* ---- total summary strip ---- */
+var totals = [
+  { val:'65+', label:'machines & labs rooted' },
+  // { val:'130+', label:'CTF challenges solved' },
+  { val:'4',    label:'platforms active' },
+  { val:'OSCP', label:'next target' }
+];
+var statsTotal = document.getElementById('statsTotal');
+var totHTML = '';
+totals.forEach(function(x){
+  totHTML +=
+    '<div class="total-item">' +
+      '<div class="metric-val">' + x.val + '</div>' +
+      '<div class="metric-label">' + x.label + '</div>' +
+    '</div>';
+});
+statsTotal.innerHTML = totHTML;
+
+/* ============================================================
+   PROJECTS — only 2, clean and balanced
 ============================================================ */
 var projects = [
   {
-    icon:'🎯', tag:'oscp · notes',
-    name:'OSCP Prep Vault',
-    desc:'Structured offensive-security notebook — enumeration checklists, privesc playbooks and box writeups.',
-    link:'https://github.com/gaurav-yadav27'
-  },
-  {
     icon:'🔐', tag:'pass · suite',
     name:'Password Security Toolkit',
-    desc:'Password manager, analyzer and generator built for real-world hygiene.',
+    desc:'Password manager, analyzer and generator built for real-world hygiene — strength scoring, entropy checks and breach lookups.',
     link:'https://github.com/gaurav-yadav27/Password-Security-Toolkit'
-  },
-  {
-    icon:'🧰', tag:'cli · automation',
-    name:'AutoRecon CLI',
-    desc:'Enumeration wrapper chaining nmap, gobuster, ffuf and SMB/NFS probes into one loot directory.',
-    link:'https://github.com/gaurav-yadav27'
   },
   {
     icon:'🔍', tag:'cli · threat scanner',
     name:'Cyber URL Threat Detector',
-    desc:'URL threat-intelligence tool flagging malicious links, phishing pages and suspicious redirects.',
+    desc:'URL threat-intelligence tool flagging malicious links, phishing pages and suspicious redirects using reputation APIs.',
     link:'https://github.com/gaurav-yadav27/Cyber-URL-Threat-Detector'
   }
 ];
@@ -1143,7 +1441,7 @@ var projectsGrid = document.getElementById('projectsGrid');
 var projHTML = '';
 projects.forEach(function(p, i){
   projHTML +=
-    '<div class="reveal" style="--d:' + (i * 110) + 'ms"><article class="proj-card">' +
+    '<div class="reveal" style="--d:' + (i * 130) + 'ms"><article class="proj-card">' +
       '<div class="proj-visual"><div class="proj-emoji">' + p.icon + '</div></div>' +
       '<div class="proj-body">' +
         '<span class="proj-tag">' + p.tag + '</span>' +
@@ -1173,10 +1471,10 @@ if ('IntersectionObserver' in window){
 }
 
 /* ============================================================
-   3D TILT on skill + project cards
+   3D TILT on cards
 ============================================================ */
 if (!reduceMotion && !isMobile){
-  var tiltCards = document.querySelectorAll('.skill-card, .proj-card');
+  var tiltCards = document.querySelectorAll('.skill-card, .proj-card, .stat-card');
   tiltCards.forEach(function(card){
     var rect = null;
     card.addEventListener('mouseenter', function(){
@@ -1228,7 +1526,7 @@ var parallaxEls = Array.prototype.slice.call(document.querySelectorAll('[data-pa
 var heroEl = document.getElementById('hero');
 var heroSectionHeight = heroEl ? heroEl.offsetHeight : 800;
 
-var sectionEls = ['hero','about','skills','projects','contact']
+var sectionEls = ['hero','about','skills','stats','projects','contact']
   .map(function(id){ return document.getElementById(id); })
   .filter(Boolean);
 
@@ -1240,23 +1538,18 @@ function onScroll(){
   var y = window.scrollY;
   var max = document.documentElement.scrollHeight - innerHeight;
 
-  // progress bar
   progressBar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
 
-  // scroll velocity (for subtle skew / dock lift)
   velY = y - lastY;
   lastY = y;
 
-  // topbar state
   if (topbar) topbar.classList.toggle('scrolled', y > 40);
 
-  // dock — subtle horizontal skew based on velocity
   if (dock && !reduceMotion){
     var dockSkew = Math.max(-6, Math.min(6, -velY * 0.25));
     dock.style.transform = 'translateX(-50%) translateY(' + (y > 40 ? '-4px' : '0') + ') rotateX(' + dockSkew.toFixed(2) + 'deg)';
   }
 
-  // hero parallax + fade
   if (y < heroSectionHeight){
     var p = y / heroSectionHeight;
     parallaxEls.forEach(function(el){
@@ -1277,7 +1570,6 @@ function onScroll(){
     });
   }
 
-  // dock active section
   var current = 'hero';
   for (var i = 0; i < sectionEls.length; i++){
     if (y >= sectionEls[i].offsetTop - innerHeight * 0.42) current = sectionEls[i].id;
@@ -1293,7 +1585,6 @@ addEventListener('scroll', function(){
   requestAnimationFrame(function(){ onScroll(); scrollTick = false; });
 }, { passive: true });
 
-// recalc hero height on resize
 addEventListener('resize', function(){
   heroSectionHeight = heroEl ? heroEl.offsetHeight : 800;
 }, { passive: true });
@@ -1312,10 +1603,10 @@ document.addEventListener('visibilitychange', function(){
 });
 
 /* ============================================================
-   MOUSE-REACTIVE CURSOR GLOW — bigger on interactive
+   CURSOR GLOW — bigger on interactive
 ============================================================ */
 if (!reduceMotion && !isMobile){
-  var hoverables = document.querySelectorAll('a, button, .chip, .skill-card, .proj-card');
+  var hoverables = document.querySelectorAll('a, button, .chip, .skill-card, .proj-card, .stat-card');
   hoverables.forEach(function(el){
     el.addEventListener('mouseenter', function(){
       cursorGlow.style.opacity = '1';
